@@ -16,11 +16,11 @@ Bl is a Python script that automates the verification of domains of interest wit
 `sudo apt install pandoc`
 * Latex  
 `sudo apt install texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra`
-* Dns Python
+* Dns Python  
 `pip -r requirements.txt`
 
 * Api Keys (Register For Free Account On These Sites)
-* Add Api Key To .bashrc Or .zshrc
+* Add Api Key (.bashrc / .zshrc)  
 `export SPAMHAUS_DQS_KEY=`
 `export VT_API_KEY=`
 `export GSB_API_KEY=`
@@ -33,14 +33,14 @@ Bl is a Python script that automates the verification of domains of interest wit
 
 ## Installing
 
-Clone the repository.
+Clone the repository.  
 `git clone https://github.com/climborazo/blacklist_checker.git`  
-Enter Blacklist Checker Folder
+Enter Blacklist Checker Folder  
 `cd blacklist_checker`
-Create And Activate Virtual Environment
-``
-``
-Intstall Requirements
+Create And Activate Virtual Environment  
+`python3 -m venv .venv`
+`. .venv/bin/activate`
+Intstall Requirements  
 `pip -r requirements.txt`
 Copy .env
 `cp .env.example config/.env`
