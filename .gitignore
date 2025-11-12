@@ -1,7 +1,0 @@
-
-.gitignore
-.git
-input/animal_voices_united.txt
-report/animal_voices_united/**
-.venv/
-.venv/**
