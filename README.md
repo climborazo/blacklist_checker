@@ -144,7 +144,7 @@ set -a; source config/.env; set +a
 | Issue | Cause | Fix |
 |-------|--------|-----|
 | `KeyError: 'provider'` | A provider was removed from mapping but still listed in defaults | The “default” provider list now filters automatically; check your `--providers` argument |
-| API 401 / quota errors | Rate limit or missing key | Verify `.env` keys and provider limits |
+| Api 401 / quota errors | Rate limit or missing key | Verify `.env` keys and provider limits |
 | Empty output | No detections or invalid domains | Check that each domain is on a separate line |
 
 ---
