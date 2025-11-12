@@ -1,0 +1,26 @@
+
+blacklist_checker/
+├─ bl.py                #
+├─ run.py               # Interactive Llauncher
+├─ input/               # Create .txt With Domains
+├─ report/              # Output Folder
+├─ config/
+│  └─ .env              # To create - Environment Variables
+├─ logs/
+├─ scripts/
+│  ├─ run_batch.sh      # Execute bl.py On All .txt In Input
+│  └─ test_env.sh       # Print All Loaded Api Keys
+├─ requirements.txt
+├─ .env.example
+├─ .gitignore
+└─ Makefile
+
+cd blacklist-checker
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example config/.env
+set -a; source config/.env; set +a
+
+python3 run.py
+
