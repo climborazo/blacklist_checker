@@ -75,6 +75,5 @@ Climborazo
 
 ## License
 
-This project is licensed under the Gnu General Public License, Version 3.0  
-See the LICENSE.md file for details
+This project is licensed under the Gnu General Public License, Version 3.0 - See the LICENSE.md file for details
 
