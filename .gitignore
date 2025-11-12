@@ -1,4 +1,8 @@
 
 .gitignore
 .git
-
+bl.py.ori
+input/animal_voices_united.txt
+report/animal_voices_united/**
+.venv/
+.venv/**
