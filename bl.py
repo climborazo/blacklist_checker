@@ -252,37 +252,576 @@ HTML_TEMPLATE = """
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Domain Blacklist Report</title>
   <style>
-    body {{ font-family: 'Century Gothic', 'Gill Sans', 'Helvetica Neue', sans-serif; margin: 24px; }}
-    h1 {{ margin-bottom: 0; }}
-    .meta {{ color: #555; margin-top: 4px; }}
-    table {{ border-collapse: collapse; width: 100%; margin-top: 20px; }}
-    th, td {{ border: 1px solid #ddd; padding: 8px; vertical-align: top; }}
-    th {{ background: #f4f4f4; text-align: left; }}
-    tr.hit {{ background: #fff7f7; }}
-    tr.hit a {{ color: #b00020; }}
-    tr.hit td {{ color: #b00020; font-weight: 600; }}
-    tr.ok {{ background: #f7fff7; }}
-    .nowrap {{ white-space: nowrap; }}
-    .provider {{ font-weight: 600; }}
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    
+    :root {{
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6c757d;
+      --border-color: #dee2e6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }}
+    
+    body.dark-mode {{
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-card: #242424;
+      --text-primary: #e5e5e5;
+      --text-secondary: #a0a0a0;
+      --border-color: #404040;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.5);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.3);
+    }}
+    
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }}
+    
+    .container {{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }}
+    
+    header {{
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }}
+    
+    h1 {{
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }}
+    
+    .header-actions {{
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }}
+    
+    .theme-toggle {{
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }}
+    
+    .theme-toggle:hover {{
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }}
+    
+    .meta {{
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 8px;
+    }}
+    
+    .dashboard {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }}
+    
+    .stat-card {{
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }}
+    
+    .stat-card:hover {{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }}
+    
+    .stat-value {{
+      font-size: 32px;
+      font-weight: 700;
+      margin: 8px 0;
+    }}
+    
+    .stat-label {{
+      color: var(--text-secondary);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }}
+    
+    .stat-card.danger .stat-value {{ color: var(--danger); }}
+    .stat-card.success .stat-value {{ color: var(--success); }}
+    .stat-card.info .stat-value {{ color: var(--info); }}
+    
+    .controls {{
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }}
+    
+    .search-box {{
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }}
+    
+    .search-box input {{
+      width: 100%;
+      padding: 10px 40px 10px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }}
+    
+    .search-box input:focus {{
+      outline: none;
+      border-color: var(--info);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }}
+    
+    .search-icon {{
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }}
+    
+    .filter-group {{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }}
+    
+    .filter-btn {{
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }}
+    
+    .filter-btn:hover {{
+      background: var(--bg-card);
+      transform: translateY(-1px);
+    }}
+    
+    .filter-btn.active {{
+      background: var(--info);
+      color: white;
+      border-color: var(--info);
+    }}
+    
+    .table-container {{
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }}
+    
+    .table-wrapper {{
+      overflow-x: auto;
+    }}
+    
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+    }}
+    
+    thead {{
+      background: var(--bg-secondary);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }}
+    
+    th {{
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }}
+    
+    th:hover {{
+      background: var(--bg-card);
+    }}
+    
+    th.sortable::after {{
+      content: '⇅';
+      margin-left: 8px;
+      opacity: 0.3;
+    }}
+    
+    th.sort-asc::after {{
+      content: '↑';
+      opacity: 1;
+    }}
+    
+    th.sort-desc::after {{
+      content: '↓';
+      opacity: 1;
+    }}
+    
+    td {{
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }}
+    
+    tbody tr {{
+      transition: background-color 0.2s;
+    }}
+    
+    tbody tr:hover {{
+      background: var(--bg-secondary);
+    }}
+    
+    .status-badge {{
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }}
+    
+    .status-listed {{
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }}
+    
+    .status-clean {{
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }}
+    
+    .domain-cell {{
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-weight: 500;
+    }}
+    
+    .provider-cell {{
+      font-weight: 600;
+    }}
+    
+    .link-btn {{
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--info);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.2s;
+    }}
+    
+    .link-btn:hover {{
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }}
+    
+    .no-results {{
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }}
+    
+    .no-results-icon {{
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }}
+    
+    footer {{
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }}
+    
+    .export-btns {{
+      display: flex;
+      gap: 8px;
+    }}
+    
+    .export-btn {{
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }}
+    
+    .export-btn:hover {{
+      background: var(--bg-card);
+      transform: translateY(-1px);
+    }}
+    
+    @media (max-width: 768px) {{
+      .container {{ padding: 12px; }}
+      header {{ flex-direction: column; align-items: flex-start; }}
+      .controls {{ flex-direction: column; align-items: stretch; }}
+      .filter-group {{ width: 100%; }}
+      .export-btns {{ flex-direction: column; }}
+      th, td {{ padding: 12px 8px; font-size: 14px; }}
+    }}
+    
+    @media print {{
+      .controls, .theme-toggle, .export-btns, .header-actions {{ display: none; }}
+      body {{ background: white; color: black; }}
+      .table-container {{ box-shadow: none; }}
+    }}
   </style>
 </head>
 <body>
-  <h1>Domain Blacklist Report</h1>
-  <div class="meta">Generated: {generated} | Providers ({providers}) | Domains Checked: {domain_count}</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Domain</th>
-        <th>Provider</th>
-        <th>Status</th>
-        <th>Reason</th>
-        <th>Verify</th>
-      </tr>
-    </thead>
-    <tbody>
-      {rows}
-    </tbody>
-  </table>
+  <div class="container">
+    <header>
+      <div>
+        <h1>
+          <span>🛡️</span>
+          Domain Blacklist Report
+        </h1>
+        <div class="meta">Generated - {generated}</div>
+      </div>
+      <div class="header-actions">
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportToCSV()">📥 Export CSV</button>
+          <button class="export-btn" onclick="window.print()">🖨️ Print</button>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+      </div>
+    </header>
+    
+    <div class="dashboard">
+      <div class="stat-card info">
+        <div class="stat-label">Total Domains</div>
+        <div class="stat-value">{domain_count}</div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-label">Total Checks</div>
+        <div class="stat-value">{total_checks}</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-label">Listed</div>
+        <div class="stat-value" id="listed-count">{listed_count}</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">Clean</div>
+        <div class="stat-value" id="clean-count">{clean_count}</div>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search domains, providers, or reasons..." onkeyup="filterTable()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" data-filter="listed" onclick="setFilter('listed')">Listed Only</button>
+        <button class="filter-btn" data-filter="clean" onclick="setFilter('clean')">Clean Only</button>
+      </div>
+    </div>
+    
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table id="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" onclick="sortTable(0)">Domain</th>
+              <th class="sortable" onclick="sortTable(1)">Provider</th>
+              <th class="sortable" onclick="sortTable(2)">Status</th>
+              <th class="sortable" onclick="sortTable(3)">Reason</th>
+              <th>Verify</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {rows}
+          </tbody>
+        </table>
+      </div>
+      <div id="no-results" class="no-results" style="display: none;">
+        <div class="no-results-icon">🔍</div>
+        <div>No results found</div>
+      </div>
+    </div>
+    
+    <footer>
+      <div><strong>Providers - </strong> {providers}</div>
+      <div style="margin-top: 8px; opacity: 0.7;">
+        Report generated by <strong>Domain Blacklist Checker</strong> • Data is accurate as of generation time
+      </div>
+    </footer>
+  </div>
+  
+  <script>
+    const allRows = {rows_json};
+    let currentFilter = 'all';
+    let sortColumn = -1;
+    let sortAsc = true;
+    
+    // Theme toggle
+    function toggleTheme() {{
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }}
+    
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') {{
+      document.body.classList.add('dark-mode');
+    }}
+    
+    // Filter functions
+    function setFilter(filter) {{
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {{
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      }});
+      filterTable();
+    }}
+    
+    function filterTable() {{
+      const search = document.getElementById('search').value.toLowerCase();
+      const tbody = document.getElementById('table-body');
+      const noResults = document.getElementById('no-results');
+      let visibleCount = 0;
+      let listedVisible = 0;
+      let cleanVisible = 0;
+      
+      tbody.querySelectorAll('tr').forEach(row => {{
+        const isListed = row.dataset.listed === 'true';
+        const text = row.textContent.toLowerCase();
+        
+        let show = true;
+        
+        if (currentFilter === 'listed' && !isListed) show = false;
+        if (currentFilter === 'clean' && isListed) show = false;
+        if (search && !text.includes(search)) show = false;
+        
+        row.style.display = show ? '' : 'none';
+        if (show) {{
+          visibleCount++;
+          if (isListed) listedVisible++;
+          else cleanVisible++;
+        }}
+      }});
+      
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      tbody.style.display = visibleCount === 0 ? 'none' : '';
+    }}
+    
+    // Sort table
+    function sortTable(col) {{
+      const tbody = document.getElementById('table-body');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      if (sortColumn === col) {{
+        sortAsc = !sortAsc;
+      }} else {{
+        sortColumn = col;
+        sortAsc = true;
+      }}
+      
+      rows.sort((a, b) => {{
+        let aVal = a.cells[col].textContent.trim();
+        let bVal = b.cells[col].textContent.trim();
+        
+        if (col === 2) {{ // Status column
+          aVal = a.dataset.listed === 'true' ? '1' : '0';
+          bVal = b.dataset.listed === 'true' ? '1' : '0';
+        }}
+        
+        return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }});
+      
+      rows.forEach(row => tbody.appendChild(row));
+      
+      document.querySelectorAll('th').forEach((th, i) => {{
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (i === col) {{
+          th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        }}
+      }});
+    }}
+    
+    // Export to CSV
+    function exportToCSV() {{
+      const rows = [['Domain', 'Provider', 'Status', 'Reason', 'Verify Link']];
+      
+      document.querySelectorAll('#table-body tr').forEach(row => {{
+        if (row.style.display !== 'none') {{
+          const cells = row.querySelectorAll('td');
+          rows.push([
+            cells[0].textContent,
+            cells[1].textContent,
+            cells[2].textContent,
+            cells[3].textContent,
+            cells[4].querySelector('a').href
+          ]);
+        }}
+      }});
+      
+      const csv = rows.map(r => r.map(c => `"${{c}}"`).join(',')).join('\\n');
+      const blob = new Blob([csv], {{ type: 'text/csv' }});
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'blacklist-report-' + new Date().toISOString().split('T')[0] + '.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }}
+  </script>
 </body>
 </html>
 """
@@ -291,30 +830,54 @@ HTML_TEMPLATE = """
 def render_html(hits: List[Hit], providers_used: List[str]) -> str:
     tz = zoneinfo.ZoneInfo("Europe/Rome")
     now_local = dt.datetime.now(tz)
+    
+    # Calculate stats
+    total_checks = len(hits)
+    listed_count = sum(1 for h in hits if h.listed)
+    clean_count = total_checks - listed_count
+    domain_count = len(set(h.domain for h in hits))
+    
     rows = []
+    rows_data = []
     for h in hits:
-        cls = "hit" if h.listed else "ok"
-        row_style = " style='color:#b00020;font-weight:600'" if h.listed else ""
-        link_style = " style='color:inherit'" if h.listed else ""
+        status_class = "status-listed" if h.listed else "status-clean"
+        status_text = "Listed" if h.listed else "Clean"
+        
         rows.append(
-            f"<tr class='{cls}'{row_style}><td>{html.escape(dcase(h.domain))}</td>"
-            f"<td class='provider'>{html.escape(tcase(h.provider))}</td>"
-            f"<td class='nowrap'>{'Listed' if h.listed else 'Not Listed'}</td>"
+            f"<tr data-listed='{str(h.listed).lower()}'>"
+            f"<td class='domain-cell'>{html.escape(dcase(h.domain))}</td>"
+            f"<td class='provider-cell'>{html.escape(tcase(h.provider))}</td>"
+            f"<td><span class='status-badge {status_class}'>{status_text}</span></td>"
             f"<td>{html.escape(tcase(h.reason))}</td>"
-            f"<td><a href='{html.escape(h.link)}' target='_blank' rel='noopener'{link_style}>Link</a></td></tr>"
+            f"<td><a href='{html.escape(h.link)}' target='_blank' rel='noopener' class='link-btn'>View Details</a></td>"
+            f"</tr>"
         )
+        
+        rows_data.append({
+            'domain': dcase(h.domain),
+            'provider': tcase(h.provider),
+            'listed': h.listed,
+            'reason': tcase(h.reason),
+            'link': h.link
+        })
+    
     formatted_providers = ", ".join([p.replace("_", " ").title() for p in providers_used])
+    
     return HTML_TEMPLATE.format(
         generated=html.escape(now_local.strftime("%Y-%m-%d %H:%M (Europe / Rome)")),
         providers=formatted_providers,
-        domain_count=len({h.domain for h in hits}),
+        domain_count=domain_count,
+        total_checks=total_checks,
+        listed_count=listed_count,
+        clean_count=clean_count,
         rows="\n".join(rows),
+        rows_json=json.dumps(rows_data)
     )
 
 def save_csv(path: str, hits: List[Hit]):
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["Domain", "Provider", "Status", "Reason", "Verify_Link"])  # header Title Case
+        writer.writerow(["Domain", "Provider", "Status", "Reason", "Verify_Link"])
         for h in hits:
             writer.writerow(h.to_row())
 
@@ -446,7 +1009,7 @@ def main():
     tz = zoneinfo.ZoneInfo("Europe/Rome")
     now_local = dt.datetime.now(tz)
     print()
-    generated_line = f"Generated: {now_local.strftime('%Y-%m-%d %H:%M (Europe / Rome)')} | Providers ({', '.join([p.replace('_',' ').title() for p in provider_keys])}) | Domains Checked: {len(set([h.domain for h in hits]))}"
+    generated_line = f"Generated - {now_local.strftime('%Y-%m-%d %H:%M (Europe / Rome)')} | Providers ({', '.join([p.replace('_',' ').title() for p in provider_keys])}) | Domains Checked: {len(set([h.domain for h in hits]))}"
     print(generated_line)
 
     print(f"{tcase(args.format)} {tcase('Written To:')} {args.out}")
