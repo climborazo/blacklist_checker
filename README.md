@@ -2,7 +2,7 @@
 
 ## Description
 
-Blackllist Checker is a Python script that automates the verification of domains of interest within blacklists.
+Blacklist Checker is a Python script that automates the verification of domains of interest within blacklists.
 
 ## Dependencies
 
@@ -21,14 +21,14 @@ Blackllist Checker is a Python script that automates the verification of domains
 
 * Api Keys (Register for free account on these sites)
 * Add Api Key (.bashrc / .zshrc)  
-`export SPAMHAUS_DQS_KEY=`
-`export VT_API_KEY=`
-`export GSB_API_KEY=`
-`export URLHAUS_API_KEY=`
-`export ABUSEIPDB_KEY=`
-`export OPENPHISH_FEED_PATH="/home/****/****/blacklist_checker/openphish.txt"`
-`export XFORCE_API_KEY=`
-`export XFORCE_API_PASSWORD=`
+`export SPAMHAUS_DQS_KEY=`  
+`export VT_API_KEY=`  
+`export GSB_API_KEY=`  
+`export URLHAUS_API_KEY=`  
+`export ABUSEIPDB_KEY=`  
+`export OPENPHISH_FEED_PATH="/home/****/****/blacklist_checker/openphish.txt"`  
+`export XFORCE_API_KEY=`  
+`export XFORCE_API_PASSWORD=`  
 `export THREATFOX_AUTH_KEY=`
 
 ## Installing
@@ -42,9 +42,9 @@ Blackllist Checker is a Python script that automates the verification of domains
 `. .venv/bin/activate`
 * Intstall Requirements  
 `pip -r requirements.txt`
-* Copy .env
+* Copy .env  
 `cp .env.example config/.env`
-* Set
+* Set  
 `set -a; source config/.env; set +a`  
 * Inside input folder, rename the domain.txt file according to your preferences and enter the domains to be checked, one per line, also create all the text files you need with the reference name, this will be used to create the report.  
 * Verify that the run.py file has execution permissions.
@@ -69,7 +69,7 @@ Climborazo
 
 ## Version History
 * 0.2
-    * Automated With Run Script
+    * Automated with Run script
 * 0.1
     * Initial Release
 
