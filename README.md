@@ -44,7 +44,7 @@ Blacklist Checker is a Python script that automates the verification of domains 
 `pip -r requirements.txt`
 * Copy .env  
 `cp .env.example config/.env`
-* Set  
+* Load all variables defined in the .env file  
 `set -a; source config/.env; set +a`  
 * Inside input folder, rename the domain.txt file according to your preferences and enter the domains to be checked, one per line, also create all the text files you need with the reference name, this will be used to create the report.  
 * Verify that the run.py file has execution permissions.
@@ -75,5 +75,6 @@ Climborazo
 
 ## License
 
-This project is licensed under the Gnu General Public License, Version 2.0 - See the LICENSE.md file for details
+This project is licensed under the Gnu General Public License, Version 3.0  
+See the LICENSE.md file for details
 
