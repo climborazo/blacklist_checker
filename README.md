@@ -1,79 +1,155 @@
-# Black List Checker
+# 🕵️‍♂️ Blacklist Checker
 
-## Description
+A Python-based tool to check domains against multiple **blacklist** and **threat intelligence** providers.  
+It features an **interactive launcher (`run.py`)**, structured output directories, and easy batch execution.
 
-Blacklist Checker is a Python script that automates the verification of domains of interest within blacklists.
+---
 
-## Dependencies
+## ⚙️ Requirements
 
-* Python  
-`sudo spt install python3`
-* Pip  
-`sudo apt install pip`
-* Python Venv  
-`sudo apt install python3-venv`
-* Pandoc  
-`sudo apt install pandoc`
-* Latex  
-`sudo apt install texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra`
-* Dns Python  
-`pip -r requirements.txt`
+- **Python 3.9+**
+- (Optional) `pandoc` if you want to export **PDF** or **DOCX** reports
+- Internet connection (for provider lookups)
 
-* Api Keys (Register for free account on these sites)
-* Add Api Key (.bashrc / .zshrc)  
-`export SPAMHAUS_DQS_KEY=`  
-`export VT_API_KEY=`  
-`export GSB_API_KEY=`  
-`export URLHAUS_API_KEY=`  
-`export ABUSEIPDB_KEY=`  
-`export OPENPHISH_FEED_PATH="/home/****/****/blacklist_checker/openphish.txt"`  
-`export XFORCE_API_KEY=`  
-`export XFORCE_API_PASSWORD=`  
-`export THREATFOX_AUTH_KEY=`
+---
 
-## Installing
+## 🚀 Installation (Ubuntu/Debian)
 
-* Clone the repository.  
-`git clone https://github.com/climborazo/blacklist_checker.git`  
-* Enter Blacklist Checker Folder  
-`cd blacklist_checker`
-* Create And Activate Virtual Environment  
-`python3 -m venv .venv`  
-`. .venv/bin/activate`
-* Intstall Requirements  
-`pip -r requirements.txt`
-* Copy .env  
-`cp .env.example config/.env`
-* Load all variables defined in the .env file  
-`set -a; source config/.env; set +a`  
-* Inside input folder, rename the domain.txt file according to your preferences and enter the domains to be checked, one per line, also create all the text files you need with the reference name, this will be used to create the report.  
-* Verify that the run.py file has execution permissions.
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip
+# Optional for PDF/DOCX export
+sudo apt install -y pandoc
 
-## Executing Script
+git clone https://github.com/climborazo/blacklist_checker.git
+cd blacklist_checker
 
-`./run.py`
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -U pip
+pip install -r requirements.txt
 
-## Help
+cp .env.example config/.env
+set -a; source config/.env; set +a
+```
 
-`python3 bl.py -h`
+---
 
-## Note
+## 📂 Project structure
 
-You can start the bl.py script directly, bypassing the automatic functions of run.py, using this syntax:
+```
+blacklist_checker/
+├─ bl.py                # main blacklist checker script
+├─ run.py               # interactive launcher
+├─ input/               # domain list files (.txt, one domain per line)
+├─ report/              # outputs grouped by input file name
+├─ config/
+│  └─ .env              # environment variables and API keys
+├─ logs/                # optional log files
+├─ scripts/
+│  └─ run_batch.sh      # non-interactive batch execution
+├─ requirements.txt
+├─ .env.example
+├─ .gitignore
+└─ README.md
+```
 
-`python3 bl.py --input input/****.txt --format (html, csv, json, docx, pdf)`
+---
 
-## Authors
+## 🌐 Supported providers
 
-Climborazo
+| Provider             | API Key | Type | Notes |
+|----------------------|:--------:|------|-------|
+| **Spamhaus DBL**     | ❌ | DNS | Free DNSBL service, suitable for moderate use |
+| **SURBL**            | ❌ | DNS | Requires local resolver (avoid public DNS for bulk use) |
+| **URIBL**            | ❌ | DNS | Free but limited; local resolver recommended |
+| **URLhaus**          | ❌ | HTTP | Public abuse.ch malware feed |
+| **Google Safe Browsing** | ✅ | HTTP | Free-tier (Google Cloud API key required) |
+| **AlienVault OTX**   | ✅ | HTTP | Free account required for API key |
+| **VirusTotal**       | ✅ | HTTP | Free public API (rate limited) |
+| **ThreatFox**        | ✅ | HTTP | Free Auth-Key (requires abuse.ch account) |
+| **OpenPhish (Community)** | ❌ | HTTP | Public phishing feed |
 
-## Release History
-* 0.2
-    * Automated with Run script
-* 0.1
-    * Initial Release
+> If an API key is missing, `bl.py` automatically skips that provider and continues.
 
-## License
+---
 
-This project is licensed under the Gnu General Public License, Version 3.0 - See the LICENSE.md file for details
+## 🧰 Usage
 
+### ▶️ Interactive mode
+
+```bash
+python3 run.py
+```
+1. Choose the input file from the `input/` directory  
+2. Select the desired output format: `html` (default), `json`, `csv`, `docx`, or `pdf`  
+3. Choose between **automatic naming** (recommended) or a **custom filename**  
+4. The output will be created under `report/<input_basename>/`
+
+### ⚙️ Batch mode
+
+```bash
+bash scripts/run_batch.sh
+```
+
+Environment variables you can override:
+```bash
+FORMAT=html          # or json/csv
+PROVIDERS=default    # or all, or a comma-separated list
+INPUT_DIR=input
+REPORT_DIR=report
+```
+
+Each input file in `input/` will produce a corresponding subfolder under `report/`.
+
+---
+
+## 🔑 Environment variables
+
+Example `.env` file:
+```bash
+# API keys (optional)
+GSB_API_KEY=            # Google Safe Browsing
+VT_API_KEY=             # VirusTotal
+THREATFOX_AUTH_KEY=     # ThreatFox (abuse.ch)
+OPENPHISH_FEED_PATH=./config/openphish.txt
+```
+
+Load the environment before running:
+```bash
+set -a; source config/.env; set +a
+```
+
+---
+
+## 🧩 Features
+
+- **Automatic output naming**: `inputname_DD_MM_YY.html`
+- **Automatic report folders**: each input file gets its own subfolder under `report/`
+- **Resilient provider logic**: gracefully skips unavailable or unauthenticated sources
+- **Supports multiple formats**: HTML, JSON, CSV, PDF, DOCX
+- **Batch execution** for scheduled tasks or automation
+- **Timezone-aware output** (Europe/Rome by default)
+
+---
+
+## 🧭 Troubleshooting
+
+| Issue | Cause | Fix |
+|-------|--------|-----|
+| `KeyError: 'provider'` | A provider was removed from mapping but still listed in defaults | The “default” provider list now filters automatically; check your `--providers` argument |
+| API 401 / quota errors | Rate limit or missing key | Verify `.env` keys and provider limits |
+| Empty output | No detections or invalid domains | Check domain list format (one per line) |
+
+---
+
+## 🪪 License
+
+This project is licensed under the **GNU GPL v3** — see the [LICENSE.md](LICENSE.md) file for details.
+
+---
+
+## 👨‍💻 Author
+
+Developed and maintained by **[climborazo](https://github.com/climborazo)**  
+Contributions and pull requests are welcome!
