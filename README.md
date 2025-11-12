@@ -1,2 +1,2 @@
-# blacklist_checker
+# Blacklist Checker
 Blacklist Domains
