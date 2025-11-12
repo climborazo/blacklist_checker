@@ -157,5 +157,4 @@ This project is licensed under the **Gnu Gpl Version 3** — see the [LICENSE.md
 
 ## 👨‍💻 Author
 
-Developed and maintained by **[climborazo](https://github.com/climborazo)**  
-Contributions and pull requests are welcome...
+Developed and maintained by **[climborazo](https://github.com/climborazo)** - Contributions and pull requests are welcome...
