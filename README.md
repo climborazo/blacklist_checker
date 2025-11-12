@@ -67,7 +67,7 @@ You can start the bl.py script directly, bypassing the automatic functions of ru
 
 Climborazo
 
-## Version History
+## Release History
 * 0.2
     * Automated with Run script
 * 0.1
