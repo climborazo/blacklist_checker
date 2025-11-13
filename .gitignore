@@ -1,0 +1,13 @@
+
+.gitignore
+.git
+bl.py.ori
+<<<<<<< HEAD
+input/**
+report/**
+=======
+input/animal_voices_united.txt
+report/animal_voices_united/**
+>>>>>>> master
+.venv/
+.venv/**
